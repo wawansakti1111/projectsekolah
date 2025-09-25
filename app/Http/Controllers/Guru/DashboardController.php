@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
-use App\Models\ProjectSubmission; // Tambahkan ini
+use App\Models\ProjectEnrollment; // Gunakan model ini
 
 class DashboardController extends Controller
 {
@@ -20,8 +20,12 @@ class DashboardController extends Controller
         // Mengambil proyek yang dibuat oleh guru, dengan jumlah pendaftaran dan pengajuan baru
         $activeProjects = Project::where('user_id', $user->id)
             ->withCount('enrollments')
-            ->withCount(['submissions as new_submissions_count' => function ($query) {
-                $query->where('status', 'submitted'); // Menghitung hanya pengajuan yang belum dinilai
+            // Ubah relasi untuk menghitung pengajuan baru
+            ->withCount(['enrollments as new_submissions_count' => function ($query) {
+                // Bergabung (join) dengan tabel submissions
+                $query->whereHas('submissions', function ($subQuery) {
+                    $subQuery->where('status', 'submitted');
+                });
             }])
             ->get();
 

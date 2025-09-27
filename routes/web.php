@@ -23,15 +23,10 @@ use App\Http\Controllers\Guru\QuizController as GuruQuizController;
 use App\Http\Controllers\Siswa\QuizController as SiswaQuizController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
+use App\Http\Controllers\Kepsek\DashboardController as KepsekDashboardController;
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::redirect('/', '/login');
+Route::redirect('/register', '/login');
 
 
 Route::get('/home', function () {
@@ -46,8 +41,10 @@ Route::get('/home', function () {
         return redirect()->route('siswa.dashboard');
     } elseif ($role == 'kepsek') {
         // Jika kepala sekolah, arahkan ke dashboard kepsek
-        return redirect()->route('admin.kepsek.dashboard');
-    }
+        return redirect()->route('kepsek.dashboard');
+    }elseif ($role == 'admin') {
+        // Jika admin, arahkan ke dashboard admin
+        return redirect()->route('admin.manajemen.index');}
 
     // Arahkan ke halaman utama jika tidak ada role yang cocok
     return redirect('/');
@@ -60,6 +57,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::middleware(['auth', 'can:is-kepsek'])->prefix('kepsek')->name('kepsek.')->group(function () {
+    Route::get('/dashboard', [KepsekDashboardController::class, 'index'])->name('dashboard');
+
+});
+
 // Grup route untuk Administrator
 Route::middleware(['auth', 'can:is-admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -68,7 +70,7 @@ Route::middleware(['auth', 'can:is-admin'])->group(function () {
         Route::resource('guru', GuruController::class);
         Route::resource('siswa', SiswaController::class);
         Route::resource('sdg', SdgController::class);
-        
+        Route::resource('kepsek', KepsekController::class);
         Route::resource('proyek', ProjectController::class);
         Route::post('/siswa/reset-kelas', [SiswaController::class, 'resetAllKelas'])->name('siswa.resetAllKelas');
         Route::resource('subject', SubjectController::class);
@@ -78,12 +80,7 @@ Route::middleware(['auth', 'can:is-admin'])->group(function () {
         Route::post('/siswa/{user}/toggle-status', [\App\Http\Controllers\Admin\SiswaController::class, 'toggleStatus'])->name('siswa.toggleStatus');
     });
 });
-
 // Grup route untuk Kepala Sekolah (Menggunakan middleware is-kepsek)
-Route::middleware(['auth', 'is-kepsek'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/kepsek/dashboard', [KepsekController::class, 'index'])->name('kepsek.dashboard');
-    Route::resource('kepsek', KepsekController::class)->except(['index']);
-});
 
 Route::middleware(['auth', 'can:is-guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');

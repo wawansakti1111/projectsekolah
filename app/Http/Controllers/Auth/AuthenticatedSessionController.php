@@ -38,6 +38,9 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'guru') {
             return redirect()->intended(route('guru.dashboard'));
         }
+        if ($user->role === 'kepsek') {
+            return redirect()->intended(route('kepsek.dashboard'));
+        }
 
         return redirect()->intended(route('home'));
         // ▲▲▲ Akhir dari logika redirect yang diperbarui ▲▲▲

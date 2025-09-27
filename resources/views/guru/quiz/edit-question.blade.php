@@ -1,68 +1,120 @@
+## 1. File View (Tampilan Form)
+
+Ini adalah file yang menampilkan form pengisian soal, di mana input untuk pilihan jawaban dan kunci jawaban ditambahkan.
+
+* **File:** `resources/views/guru/quiz/edit-question.blade.php`
+
+```php
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Pertanyaan Kuis') }}
+            {{ __('Quiz') }}
         </h2>
+        <x-slot name="breadcrumb">
+            <h5 class="flex items-center space-x-2 text-gray-500 text-sm">
+                <span>Quiz</span>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <span>Bank Soal</span>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <span>{{ isset($question->id) ? 'Edit Soal' : 'Tambah Soal' }}</span>
+            </h5>
+        </x-slot>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                {{-- ▼▼▼ PERBAIKAN DI BARIS INI: 'option_text' diubah menjadi 'text' agar sesuai dengan x-model="option.text" ▼▼▼ --}}
-                <section x-data="{
-                    options: @js(old('options', $question->options->map(fn($opt) => ['text' => $opt->option_text, 'is_correct' => $opt->is_correct]))),
-                    addOption() { this.options.push({ text: '', is_correct: false }); },
-                    removeOption(index) { if (this.options.length > 2) { this.options.splice(index, 1); } },
-                    setCorrect(selectedIndex) {
-                        this.options.forEach((option, index) => {
-                            option.is_correct = (index === selectedIndex);
-                        });
-                    }
-                }">
-                    <header>
-                        <h2 class="text-lg font-medium text-gray-900">Edit Pertanyaan</h2>
-                    </header>
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-xl font-bold mb-6">{{ isset($question->id) ? 'Edit Soal' : 'Tambah Soal Baru' }}</h3>
 
-                    <form method="POST" action="{{ route('guru.quiz.questions.update', $question) }}" class="mt-6 space-y-6" enctype="multipart/form-data">
+                    <form method="POST" action="{{ isset($question->id) ? route('guru.questions.update', $question->id) : route('guru.questions.store') }}" enctype="multipart/form-data">
                         @csrf
-                        @method('PUT')
+                        @if(isset($question->id))
+                            @method('PUT')
+                        @endif
 
-                        <div>
-                            <x-input-label for="question_text" value="Teks Pertanyaan" />
-                            <textarea id="question_text" name="question_text" rows="3" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>{{ old('question_text', $question->question_text) }}</textarea>
+                        <input type="hidden" name="quiz_id" value="{{ $quiz->id }}">
+
+                        <div class="mb-4">
+                            <x-input-label for="question" :value="__('Pertanyaan')" />
+                            <textarea id="question" name="question" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" rows="4" required>{{ old('question', $question->question ?? '') }}</textarea>
+                            <x-input-error class="mt-2" :messages="$errors->get('question')" />
                         </div>
 
-                        <div>
-                            <x-input-label for="image" value="Gambar (Opsional)" />
-                            <input type="file" id="image" name="image" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-                            @if ($question->image)
-                                <p class="mt-2 text-xs text-gray-500">Gambar saat ini:</p>
-                                <img src="{{ asset('storage/' . $question->image) }}" alt="Gambar Pertanyaan" class="max-w-xs rounded-md mt-1">
+                        <div class="mb-4">
+                            <x-input-label for="image" :value="__('Foto (Optional)')" />
+                            <input id="image" name="image" type="file" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                            <x-input-error class="mt-2" :messages="$errors->get('image')" />
+                            @if(isset($question) && $question->image)
+                                <p class="text-sm text-gray-500 mt-2">Gambar saat ini: <a href="{{ Storage::url($question->image) }}" target="_blank" class="text-indigo-600 hover:text-indigo-900">Lihat Gambar</a></p>
                             @endif
                         </div>
 
-                        <div>
-                            <x-input-label value="Pilihan Jawaban (Pilih satu jawaban benar)" />
-                            <div class="mt-2 space-y-3">
-                                <template x-for="(option, index) in options" :key="index">
-                                    <div class="flex items-center gap-4">
-                                        <input type="radio" name="correct_option_index" x-bind:value="index" @change="setCorrect(index)" x-bind:checked="option.is_correct" class="form-radio text-blue-600 focus:ring-blue-500">
-                                        {{-- Input ini mengharapkan 'option.text' --}}
-                                        <input type="text" x-bind:name="`options[${index}][option_text]`" x-model="option.text" class="block w-full border-gray-300 rounded-md shadow-sm" placeholder="Teks Jawaban" required>
-                                        <input type="hidden" x-bind:name="`options[${index}][is_correct]`" x-bind:value="option.is_correct ? 1 : 0">
-                                        <button type="button" @click="removeOption(index)" x-show="options.length > 2" class="text-red-500 hover:text-red-700 font-bold text-lg">&times;</button>
-                                    </div>
-                                </template>
-                            </div>
-                            <x-secondary-button type="button" @click="addOption" class="mt-3 text-xs">+ Tambah Pilihan</x-secondary-button>
-                        </div>
+                        {{-- START: BLOCK BARU UNTUK PILIHAN JAWABAN DAN KUNCI --}}
+                        <div class="mt-6 p-4 sm:p-8 bg-gray-50 shadow sm:rounded-lg border border-gray-200">
+                            <h4 class="text-lg font-semibold border-b pb-2 mb-4 text-gray-700">{{ __('Pilihan Jawaban (A, B, C, D) dan Kunci') }}</h4>
 
-                        <div class="flex items-center justify-end">
-                            <a href="{{ route('guru.quiz.show', $question->quiz_id) }}" class="text-sm text-gray-600 hover:text-gray-900">Batal</a>
-                            <x-primary-button class="ms-4">Simpan Perubahan</x-primary-button>
+                            @php
+                                // Mengambil data lama atau data dari relasi options jika ada
+                                $options = old('options', $question->options ?? collect());
+                                $labels = ['A', 'B', 'C', 'D'];
+                                // Untuk mode edit, cari index jawaban yang benar
+                                $correct_index_model = isset($question) ? $question->options->search(function($option) { return $option->is_correct == 1; }) : null;
+                                $correct_option_index = old('correct_option_index', $correct_index_model);
+                            @endphp
+
+                            @foreach ($labels as $index => $label)
+                                <div class="flex items-center space-x-4 mb-4 p-3 border rounded-lg bg-white">
+                                    <div class="flex-grow">
+                                        <x-input-label for="option_{{ $label }}" :value="__('Pilihan ' . $label)" />
+                                        <x-text-input 
+                                            id="option_{{ $label }}" 
+                                            name="options[{{ $index }}][text]" 
+                                            type="text" 
+                                            class="mt-1 block w-full" 
+                                            {{-- Menghandle data lama dari form validation atau data dari model untuk mode edit --}}
+                                            :value="$options->get($index)['text'] ?? ($options->get($index)->option_text ?? '')" 
+                                            required 
+                                            placeholder="Masukkan teks untuk Pilihan {{ $label }}"
+                                        />
+                                        <x-input-error class="mt-2" :messages="$errors->get('options.' . $index . '.text')" />
+                                    </div>
+
+                                    <div class="flex-shrink-0 pt-6">
+                                        <label for="is_correct_{{ $label }}" class="inline-flex items-center cursor-pointer">
+                                            <input 
+                                                id="is_correct_{{ $label }}" 
+                                                name="correct_option_index" 
+                                                type="radio" 
+                                                class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500" 
+                                                value="{{ $index }}" 
+                                                {{-- Logika checked untuk mode edit atau old() --}}
+                                                {{ $correct_option_index == $index ? 'checked' : '' }}
+                                                required
+                                            >
+                                            <span class="ml-2 text-sm font-medium text-gray-700">{{ __('Kunci Jawaban') }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                            <x-input-error class="mt-2" :messages="$errors->get('correct_option_index')" />
+                        </div>
+                        {{-- END: BLOCK BARU UNTUK PILIHAN JAWABAN DAN KUNCI --}}
+
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('guru.quizzes.show', $quiz->id) }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150 mr-3">
+                                {{ __('Batal') }}
+                            </a>
+                            <x-primary-button class="ms-4">
+                                {{ __('Simpan Soal') }}
+                            </x-primary-button>
                         </div>
                     </form>
-                </section>
+                </div>
             </div>
         </div>
     </div>

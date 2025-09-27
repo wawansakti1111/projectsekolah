@@ -19,7 +19,7 @@
                             <span class="text-green-200 font-medium mx-2">/</span>
                             <span class="text-white">{{ $lmsContent->title }}</span>
                         </h2>
-                        <p class="text-green-100 text-sm mt-1">Pelajari konten ini sampai selesai</p>
+                        <p class="text-green-100 text-sm mt-1">Pelajari semua materi di bawah ini</p>
                     </div>
                 </div>
             </div>
@@ -28,7 +28,6 @@
 
     <div class="py-8 md:py-12 bg-gradient-to-br from-green-50 via-white to-emerald-50 min-h-screen relative overflow-hidden"
          x-data="{ isImageModalOpen: false, imageUrl: '' }">
-        <!-- Background decorative elements -->
         <div class="absolute top-0 left-0 w-96 h-96 bg-green-100 rounded-full opacity-20 -translate-x-48 -translate-y-48"></div>
         <div class="absolute bottom-0 right-0 w-80 h-80 bg-emerald-100 rounded-full opacity-20 translate-x-40 translate-y-40"></div>
 
@@ -56,27 +55,25 @@
                             </h3>
                             <nav class="space-y-2">
                                 @foreach ($lmsContent->material->contents as $contentItem)
-                                    @php
-                                        $isActive = ($contentItem->id === $lmsContent->id);
-                                    @endphp
+                                    @php $isActive = ($contentItem->id === $lmsContent->id); @endphp
                                     <a href="{{ route('siswa.lms.content.show', $contentItem) }}"
                                        class="flex items-start gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {{ $isActive ? 'bg-green-50 border border-green-200 text-green-800 shadow-sm' : 'text-gray-600 hover:bg-green-50 hover:text-green-700' }}">
                                         @if($contentItem->type == 'quiz')
                                             <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ $isActive ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-400' }}">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
                                             </div>
                                         @elseif($contentItem->type == 'file')
                                             <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ $isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400' }}">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor">
+                                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
                                             </div>
                                         @else
                                             <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ $isActive ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400' }}">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor">
+                                                    <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                                 </svg>
                                             </div>
                                         @endif
@@ -101,25 +98,114 @@
                             @endif
                         </div>
 
-                        <!-- Body Konten -->
+                        <!-- Body: Daftar File/Materi -->
                         <div class="p-6 md:p-7 flex-grow overflow-y-auto">
-                            @if ($view_mode === 'start')
-                                @include('siswa.quiz.partials.start-content')
-                            @elseif ($view_mode === 'take')
-                                @include('siswa.quiz.partials.take-content')
-                            @elseif ($view_mode === 'result')
-                                @include('siswa.quiz.partials.result-content')
-                            @elseif ($view_mode === 'embed' && isset($embedUrl))
-                                @include('siswa.lms.partials.content-embed')
-                            @else
-                                <div class="flex items-center justify-center h-full text-center py-12 text-gray-500">
-                                    <div class="flex flex-col items-center">
-                                        <svg class="w-16 h-16 text-green-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                        </svg>
-                                        <p class="text-lg font-medium">Konten tidak tersedia</p>
-                                    </div>
+                            @php
+                                $hasFiles = $lmsContent->files && $lmsContent->files->isNotEmpty();
+                                $hasLinks = $lmsContent->links && $lmsContent->links->isNotEmpty();
+                                $hasVideos = $lmsContent->videos && $lmsContent->videos->isNotEmpty();
+                                $hasAny = $hasFiles || $hasLinks || $hasVideos;
+                            @endphp
+
+                            @if ($hasAny)
+                                <div class="space-y-4">
+                                    <!-- Files -->
+                                    @if($hasFiles)
+                                        @foreach($lmsContent->files as $file)
+                                            <div class="flex items-start gap-4 p-4 bg-blue-50/60 rounded-xl border border-blue-200/50 hover:bg-blue-100/60 transition-colors">
+                                                <div class="w-10 h-10 flex-shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                                                    <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-grow min-w-0">
+                                                    <p class="font-medium text-gray-900 truncate">{{ $file->original_name ?? 'File Materi' }}</p>
+                                                    <p class="text-sm text-blue-700 mt-1">
+                                                        {{ \Illuminate\Support\Str::limit($file->mime_type, 30) }} • 
+                                                        {{ \Illuminate\Support\Str::of($file->size)->replaceMatches('/(\d+)(\d{3})$/', '$1.$2 KB') }}
+                                                    </p>
+                                                </div>
+                                                <a href="{{ asset('storage/' . $file->path) }}" 
+                                                   target="_blank"
+                                                   class="inline-flex items-center gap-1 text-sm font-semibold text-blue-700 hover:text-blue-900 group">
+                                                    Buka
+                                                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    @endif
+
+                                    <!-- Links -->
+                                    @if($hasLinks)
+                                        @foreach($lmsContent->links as $link)
+                                            <div class="flex items-start gap-4 p-4 bg-purple-50/60 rounded-xl border border-purple-200/50 hover:bg-purple-100/60 transition-colors">
+                                                <div class="w-10 h-10 flex-shrink-0 rounded-lg bg-purple-100 flex items-center justify-center">
+                                                    <svg class="w-5 h-5 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.563-1.563m-3.086-3.086l1.563-1.563m0 0l1.563 1.563m-1.563-1.563l-4 4a4 4 0 005.656 5.656" />
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-grow min-w-0">
+                                                    <p class="font-medium text-gray-900 truncate">{{ $link->title ?? 'Link Eksternal' }}</p>
+                                                    <p class="text-sm text-purple-700 mt-1 truncate">{{ $link->url }}</p>
+                                                </div>
+                                                <a href="{{ $link->url }}" 
+                                                   target="_blank"
+                                                   class="inline-flex items-center gap-1 text-sm font-semibold text-purple-700 hover:text-purple-900 group">
+                                                    Buka
+                                                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    @endif
+
+                                    <!-- Videos -->
+                                    @if($hasVideos)
+                                        @foreach($lmsContent->videos as $video)
+                                            <div class="flex items-start gap-4 p-4 bg-red-50/60 rounded-xl border border-red-200/50 hover:bg-red-100/60 transition-colors">
+                                                <div class="w-10 h-10 flex-shrink-0 rounded-lg bg-red-100 flex items-center justify-center">
+                                                    <svg class="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-grow min-w-0">
+                                                    <p class="font-medium text-gray-900 truncate">{{ $video->title ?? 'Video Materi' }}</p>
+                                                    <p class="text-sm text-red-700 mt-1">Video pembelajaran</p>
+                                                </div>
+                                                <button @click="imageUrl = '{{ $video->thumbnail_url }}'; isImageModalOpen = true"
+                                                        class="inline-flex items-center gap-1 text-sm font-semibold text-red-700 hover:text-red-900 group">
+                                                    Putar
+                                                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a2.5 2.5 0 110 5H9V10z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    @endif
                                 </div>
+                            @else
+                                <!-- Fallback ke mode lama jika tidak ada file/link -->
+                                @if ($view_mode === 'start')
+                                    @include('siswa.quiz.partials.start-content')
+                                @elseif ($view_mode === 'take')
+                                    @include('siswa.quiz.partials.take-content')
+                                @elseif ($view_mode === 'result')
+                                    @include('siswa.quiz.partials.result-content')
+                                @elseif ($view_mode === 'embed' && isset($embedUrl))
+                                    @include('siswa.lms.partials.content-embed')
+                                @else
+                                    <div class="flex items-center justify-center h-full text-center py-12 text-gray-500">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-16 h-16 text-green-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            </svg>
+                                            <p class="text-lg font-medium">Tidak ada materi tersedia</p>
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                         </div>
 
@@ -169,7 +255,7 @@
             </div>
         </div>
 
-        <!-- Modal Gambar -->
+        <!-- Modal Gambar/Video -->
         <div x-show="isImageModalOpen" 
              x-cloak 
              @keydown.escape.window="isImageModalOpen = false"
@@ -177,7 +263,7 @@
             <div @click.outside="isImageModalOpen = false" 
                  class="relative max-w-screen-xl max-h-[90vh]">
                 <img :src="imageUrl" 
-                     alt="Gambar Pertanyaan Diperbesar" 
+                     alt="Pratinjau" 
                      class="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/20">
                 <button @click="isImageModalOpen = false" 
                         class="absolute -top-4 -right-4 bg-white text-gray-800 rounded-full p-2.5 shadow-xl hover:bg-gray-100 transition-colors">
@@ -189,7 +275,6 @@
         </div>
     </div>
 
-    <!-- Animations -->
     <style>
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(15px); }
@@ -199,7 +284,7 @@
             animation: fadeInUp 0.5s ease-out forwards;
         }
         .delay-100 {
-            animation-delay: 0.1s !important;
+            animation-delay: 0.1s;
         }
     </style>
 </x-app-layout>

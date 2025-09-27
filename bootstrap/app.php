@@ -12,9 +12,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Daftarkan middleware khusus untuk Kepsek
-        $middleware->alias([
-            'is-kepsek' => \App\Http\Middleware\IsKepsek::class,
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -29,59 +29,65 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
 
             @forelse ($analyticsData as $data)
-                <div class="bg-white/80 backdrop-blur-xl overflow-hidden shadow-xl sm:rounded-3xl border border-green-200/40 animate-fadeInUp">
-                    <div class="p-6 md:p-8">
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-green-100 overflow-hidden animate-fadeInUp hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6 md:p-7">
                         <header class="mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                            <div class="flex items-start gap-4">
+                                <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
                                     <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M9 11a2 2 0 11-4 0 2 2 0 014 0zm0 0v-2a2 2 0 012-2m-2 2H5" />
                                     </svg>
                                 </div>
-                                <h2 class="text-2xl font-bold text-gray-900">{{ $data['material']->title }}</h2>
+                                <div>
+                                    <h2 class="text-xl font-bold text-gray-900 leading-tight">{{ $data['material']->title }}</h2>
+                                    <p class="mt-1 text-sm text-gray-600">
+                                        Total <span class="font-semibold text-green-700">{{ $data['total_contents'] }}</span> konten • Progress siswa
+                                    </p>
+                                </div>
                             </div>
-                            <p class="mt-2 text-gray-600 font-medium">
-                                Total <span class="text-green-700 font-semibold">{{ $data['total_contents'] }}</span> konten • Progress siswa
-                            </p>
                         </header>
 
                         <div class="overflow-x-auto -mx-2 px-2">
-                            <table class="min-w-full divide-y divide-gray-200/70 text-sm">
+                            <table class="min-w-full text-sm">
                                 <thead>
-                                    <tr class="bg-green-50/60">
-                                        <th class="px-4 py-3 text-left font-semibold text-green-800">Nama Siswa</th>
-                                        <th class="px-4 py-3 text-left font-semibold text-green-800">Progress</th>
-                                        <th class="px-4 py-3 text-left font-semibold text-green-800">Persentase</th>
+                                    <tr class="text-left text-xs font-semibold text-green-800 uppercase tracking-wider">
+                                        <th class="py-3 px-4">Nama Siswa</th>
+                                        <th class="py-3 px-4">Progress</th>
+                                        <th class="py-3 px-4 text-right">Persentase</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200/50">
+                                <tbody class="divide-y divide-gray-100">
                                     @forelse ($data['progress_by_siswa'] as $siswaId => $progress)
                                         @php
                                             $percentage = ($progress['completed_count'] / max($data['total_contents'], 1)) * 100;
                                         @endphp
-                                        <tr class="hover:bg-green-50/30 transition-colors">
-                                            <td class="px-4 py-4 font-medium text-gray-900">{{ $progress['name'] }}</td>
-                                            <td class="px-4 py-4">
-                                                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500 ease-out"
-                                                         style="width: {{ round($percentage) }}%"></div>
+                                        <tr class="hover:bg-green-50/40 transition-colors group">
+                                            <td class="py-4 px-4 font-medium text-gray-900 group-hover:text-green-800">
+                                                {{ $progress['name'] }}
+                                            </td>
+                                            <td class="py-4 px-4">
+                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                    <div 
+                                                        class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-700 ease-out"
+                                                        style="width: {{ round($percentage) }}%">
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td class="px-4 py-4">
-                                                <span class="inline-flex items-center gap-1">
-                                                    <span class="text-gray-700">{{ $progress['completed_count'] }} / {{ $data['total_contents'] }}</span>
-                                                    <span class="font-bold text-emerald-700">({{ round($percentage) }}%)</span>
+                                            <td class="py-4 px-4 text-right">
+                                                <span class="inline-flex items-center gap-1 font-medium">
+                                                    <span class="text-gray-700">{{ $progress['completed_count'] }}/{{ $data['total_contents'] }}</span>
+                                                    <span class="text-emerald-700">({{ round($percentage) }}%)</span>
                                                 </span>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="3" class="px-4 py-8 text-center text-gray-500 italic">
-                                                <div class="flex flex-col items-center justify-center gap-2">
-                                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            <td colspan="3" class="py-10 px-4 text-center">
+                                                <div class="flex flex-col items-center justify-center gap-3 text-gray-500">
+                                                    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                     </svg>
-                                                    Belum ada siswa yang memulai materi ini.
+                                                    <p class="text-sm font-medium">Belum ada siswa yang memulai materi ini.</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -92,15 +98,15 @@
                     </div>
                 </div>
             @empty
-                <div class="bg-white/80 backdrop-blur-xl overflow-hidden shadow-xl sm:rounded-3xl border border-green-200/40 p-12 text-center animate-fadeInUp">
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-green-100 p-10 text-center animate-fadeInUp">
                     <div class="max-w-md mx-auto">
-                        <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-6">
+                        <div class="w-16 h-16 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-5">
                             <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Belum Ada Data Analitik</h3>
-                        <p class="text-gray-600">
+                        <p class="text-gray-600 max-w-prose">
                             Anda belum membuat materi ajar atau belum ada progress dari siswa.
                         </p>
                     </div>
@@ -123,12 +129,12 @@
             }
         }
         .animate-fadeInUp {
-            animation: fadeInUp 0.5s ease-out forwards;
+            animation: fadeInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        /* Tipografi premium */
+        /* Gunakan Figtree sesuai layout Anda */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Figtree', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
